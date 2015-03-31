@@ -1,0 +1,100 @@
+/* Place project-specific CSS here */
+
+@font-face {
+	font-family: myFirstFont;
+	src: url(sansation_light.woff);
+}
+
+@import url(http://fonts.googleapis.com/css?family=GFS+Didot&subset=greek);
+
+body{
+font-size:1em;
+/*font-family:  "Palatino Linotype";*/
+font-family: 'GFS Didot', serif;
+}
+
+#primary-nav.container{
+	background: #ab9e71 ;
+	color:#fff;
+}
+
+#primary-nav.container a:link {
+        background: #ab9e71 ;
+	color:#fff;
+}
+
+
+#content{
+width:100%;
+}
+
+#primary{
+width:70%;
+}
+
+/* Ligne 95 */
+h1, h2, h3, h4, h5, h6
+{
+  background-color: white;
+  color:#ab9e71;
+  padding:0 0 0 0;
+  margin:20px 0 10px 0 ;}
+
+h1{
+font-size:1.4em;
+  font-variant : small-caps;
+font-weight:bold;
+}
+
+#primary ul{
+margin:0;
+}
+
+#primary a{
+color: #ab9e71 ;
+}
+
+#primary ul li:before{
+content:"ý  ";
+color: #ab9e71 ;
+}
+
+#primary ul li {
+list-style: none;
+}
+
+
+
+
+milestone{
+
+}
+
+milestone:after{
+font-size:0.8em;
+font-weight:bold;
+padding:0 3px;
+content:attr(n);
+
+}
+
+bibl:before{
+color:grey;
+content : "[Ref. "
+}
+
+bibl{
+color:grey;
+}
+
+bibl:after{
+color:grey;
+content : "]"
+}
+
+.translatio{
+	background-color: rgb(220,220,220);
+	border-color: rgb(150,150,150);
+	margin:1em 0 0 2.5em;
+        padding:1em;
+}

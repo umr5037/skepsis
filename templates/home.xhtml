@@ -1,0 +1,57 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+   <head>
+      <meta charset="utf-8" />
+      <title>{title}</title>
+      <meta name="description" content="{description}" />
+      <meta name="author" content="{author}" />
+      <meta name="keywords" content="{subject}" />
+      
+      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet" />
+      <!-- <link href="/synopsx/files/css/main.css" rel="stylesheet" /> -->
+      <link href="/synopsx/files/css/ahn.css" rel="stylesheet" />
+      <link href="/static/skepsis/css/skepsis.css" rel="stylesheet" />
+     
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+      <script src="/synopsx/files/js/synopsx.js"></script>
+      
+   </head>
+   <body>
+ 
+<header data-url="inc_header"/>
+<div data-url="inc_navbar"/>
+<div>
+  <nav id="contextual" class="sidebar-nav">
+  <h3>Vue facettes</h3>
+TO DO...
+      <p>Requested project : <span>{project}</span></p>
+      <p>Requested database : <span>{dbName}</span></p>
+      <p>Requested model : <span>{model}</span></p>
+      <p>Requested function : <span>{function}</span></p>
+      <p>Requested text id : <span>{textId}</span></p>
+      <p>Other parameters : <span>{otherParams}</span></p>
+
+  </nav>
+  <section id="main">
+  <hr/>
+  <hr/>
+    <h1>{title}</h1> 
+   
+    
+    {content} 
+    
+
+  </section>
+         
+  </div> 
+<hr/>
+<footer data-url="inc_footer"/>
+     <!-- script menu -->
+    <script type="text/javascript">
+         // synopsx's composition
+         $(document).ready(function(){
+             init();
+         }); 
+       </script>
+   </body>
+</html>
