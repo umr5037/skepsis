@@ -136,6 +136,67 @@ function textsHtml() {
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
 
+
+(:~
+ : this resource function is the html representation of the corpus resource
+ :
+ : @return an html representation of the corpus resource with a bibliographical list
+ : the HTML serialization also shows a bibliographical list
+ :)
+declare 
+  %restxq:path('/skepsis/volumina/{$title}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function textHtml($title) {  
+ let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getTextByTitle',
+    'title' : $title
+    }
+    let $text := skepsis.models.tei:getTextByTitle($queryParams)
+     let $premierChapitre := skepsis.models.tei:getFirstChapter($text)
+     return
+  <rest:response>
+    <http:response status="303" message="See Other">
+      <http:header name="location" value="/skepsis/volumina/{$title}/livre/{map:get($premierChapitre, 'livre')}/chapitre/{map:get($premierChapitre, 'chapitre')}"/>
+    </http:response>
+  </rest:response>
+};
+
+(:~
+ : this resource function is the html representation of the corpus resource
+ :
+ : @return an html representation of the corpus resource with a bibliographical list
+ : the HTML serialization also shows a bibliographical list
+ :)
+declare 
+  %restxq:path('/skepsis/volumina/{$title}/livre/{$livre}/chapitre/{$chapitre}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function textHtml($title, $livre, $chapitre) {  
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getChapter',
+    'title' : $title,
+    'livre' : $livre,
+    'chapitre' : $chapitre
+    }
+   let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'home.xhtml',
+    'pattern' : 'inc_chapterItem.xhtml'
+    (: specify an xslt mode and other kind of output options :)
+    }
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
+
+
 declare 
   %restxq:path('/skepsis/sceptici')
   %rest:produces('text/html')

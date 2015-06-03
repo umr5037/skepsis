@@ -65,6 +65,36 @@ map {
     }
 };
 
+declare function getFirstChapter($volumen as node()) as map(*){
+   let $premierLivre := $volumen//tei:div[@type="livre"][1]
+   let $premierChapitre := $premierLivre//tei:div[@type="chapitre"][1]
+   return map{
+     'livre' : $premierLivre/fn:data(@n),
+     'chapitre' : $premierChapitre/fn:data(@n)
+   }
+};
+
+declare function getChapterById($queryParams as map(*)) as node()*{
+ synopsx.lib.commons:getDb($queryParams)/tei:TEI[.//tei:titleStmt/tei:title = map:get($queryParams, 'title')]//tei:div[@type="livre" and @n=map:get($queryParams, 'livre')]/tei:div[@type="chapitre" and @n=map:get($queryParams, 'chapitre')]
+};
+
+(: declare function getNextChapter($volumen as node(), $NLivre as xs:string, $NChapitre as xs:string) as map(*){
+            
+      let $livre := $volumen//tei:div[@type="livre" and @n=$NLivre]
+      let $chapitre := $livre//tei:div[@type="chapitre" and @n=$NChapitre]
+
+        let $suivant :=
+        if(not(empty($chapitre/following-sibling::tei:div[@type="chapitre"])))
+        then($chapitre/following-sibling::tei:div[@type="chapitre"][1])
+        else(if(not(empty($livre/following-sibling::tei:div[@type="livre"])))
+             then($livre/following-sibling::tei:div[@type="livre"]/tei:div[@type="chapitre"][1])
+             else())
+      
+      let $content := $volumen/tei:TEI[fn:not(@xml:id = "skepsis")]
+      let $livre := $volumen//tei:div[@type="livre"][1]
+      let $chapitre := $livre//tei:div[@type="chapitre"][1]
+}; :)
+
 
 (:~
  : this function returns a sequence of map for meta and content
@@ -76,17 +106,55 @@ declare function getTextsList($queryParams as map(*)) as map(*) {
   let $meta := map{
     'title' : 'Liste des textes'
     }
-  let $content := for $volumen in synopsx.lib.commons:getDb($queryParams)/tei:TEI[fn:not(@xml:id = "skepsis")]
-                     let $premierLivre := $volumen//tei:div[@type="livre"][1]
-                     let $premierChapitre := $premierLivre//tei:div[@type="chapitre"][1]
-                     return 
-                     map {
-                          'url': "volumen/" || $volumen//tei:titleStmt/tei:title/text() || "/livre/" || fn:data($premierLivre/@n) || "/chapitre/" || fn:data($premierChapitre/@n),
-                          'author':$volumen//tei:titleStmt/tei:author/text(),
-                          'title':$volumen//tei:titleStmt/tei:title/text() 
-                         } 
+  let $content := for $volumen in synopsx.lib.commons:getDb($queryParams)/tei:TEI[fn:not(@xml:id = "skepsis")]       
+     return 
+     map {
+          'url': "volumina/" || $volumen//tei:titleStmt/tei:title/text(),
+          'author':$volumen//tei:titleStmt/tei:author/text(),
+          'title':$volumen//tei:titleStmt/tei:title/text() 
+         } 
   return  map{
     'meta'    : $meta,
     'content' : $content
     }
+};
+
+(:~
+ : this function returns a sequence of map for meta and content
+ : !! the result structure has changed to allow sorting early in mapping
+ :
+ : @rmq for testing with new htmlWrapping
+ :)
+declare function getChapter($queryParams as map(*)) as map(*) {
+  
+  let $volumen := getTextByTitle($queryParams)
+  let $author := $volumen//tei:titleStmt/tei:author/text()
+  let $title := $volumen//tei:titleStmt/tei:title/text() 
+  
+  let $meta := map{
+    'title' : $title,
+    'author' : $author,
+    'livre' : map:get($queryParams, 'livre'),
+    'chapitre' : map:get($queryParams, 'chapitre')  
+           }
+  let $chapitre := getChapterById($queryParams)      
+  let $content :=
+     map {
+          'tei': $chapitre
+
+         } 
+  return  map{
+    'meta'    : $meta,
+    'content' : $content
+    }
+};
+
+(:~
+ : this function returns a sequence of map for meta and content
+ : !! the result structure has changed to allow sorting early in mapping
+ :
+ : @rmq for testing with new htmlWrapping
+ :)
+declare function getTextByTitle($queryParams as map(*)) as node()* {
+   synopsx.lib.commons:getDb($queryParams)/tei:TEI[.//tei:titleStmt/tei:title = map:get($queryParams, 'title')]          
 };
