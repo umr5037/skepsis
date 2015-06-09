@@ -65,6 +65,72 @@ map {
     }
 };
 
+
+(:~
+ : this function returns a sequence of map for meta and content
+ : !! the result structure has changed to allow sorting early in mapping
+ :
+ : @rmq for testing with new htmlWrapping
+ :)
+declare function getNotionesList($queryParams as map(*)) as map(*) {
+  let $notiones := synopsx.lib.commons:getDb($queryParams)//tei:keywords//tei:term
+  let $meta := map{
+    'title' : 'Liste des notions'
+    }
+  let $content := for $notio in $notiones return getNotio($notio)
+  return  map{
+    'meta'    : $meta,
+    'content' : $content
+    }
+};
+
+
+declare function getNotio($item as node()) as map(*){
+        map {
+         'title' : $item/text() ,
+         'id' : $item/@xml:id ,
+         'tei' : $item,
+         'url' : 'notiones/' || $item/@xml:id
+        }
+};
+
+
+declare function getTextPartByNotio($queryParams as map(*)) as map(*) {
+  let $ref := '#' || map:get($queryParams, 'id')
+  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@ana contains text {$ref}]
+  let $meta := map{
+    'title' : 'Notion : ' ||  map:get($queryParams, 'id')
+    }
+  let $content := for $item in $parts return 
+          map {
+         'id' : $item/@xml:id,
+         'type' : $item/@type,
+         'n' : $item/@n,
+         'corresp' : $item/@corresp,
+         'gr': $item,
+          'fr' : synopsx.lib.commons:getDb($queryParams)//tei:*[@corresp = '#' || $item/@xml:id],
+         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author/text(),
+         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title/text(),
+          'livre':$item/ancestor::tei:div[@type='livre']/fn:data(@n),
+          'chapitre' :  $item/ancestor::tei:div[@type='chapitre']/fn:data(@n),
+          'paragraphe' : getParagraph(map:put($queryParams, 'id', $item/fn:data(@xml:id)))
+        }
+  return  map{
+    'meta'    : $meta,
+    'content' : $content
+    }
+};
+
+declare function getParagraph($queryParams as map(*))  {
+  let $textPartId :=  map:get($queryParams, 'id')
+  let $tei := synopsx.lib.commons:getDb($queryParams)//tei:div[tei:*[@xml:id = $textPartId]]
+  let $textPart := $tei//tei:*[@xml:id = $textPartId]
+  let $paragraph := $textPart/*:milestone[1]/fn:data(@n)
+  return if(fn:empty($paragraph) || fn:not(fn:normalize-space($textPart/*:milestone[1]/fn:string-join(preceding-sibling::text())) = '')) then $tei//tei:*[@xml:id = $textPartId]//preceding::*:milestone[1]/fn:data(@n)
+          else $paragraph 
+          
+};
+
 declare function getFirstChapter($volumen as node()) as map(*){
    let $premierLivre := $volumen//tei:div[@type="livre"][1]
    let $premierChapitre := $premierLivre//tei:div[@type="chapitre"][1]
@@ -140,8 +206,9 @@ declare function getChapter($queryParams as map(*)) as map(*) {
   let $chapitre := getChapterById($queryParams)      
   let $content :=
      map {
-          'tei': $chapitre
-
+          'tei': $chapitre,
+          'gr' : $chapitre/tei:ab[fn:not(@type='translatio')],
+          'fr' : $chapitre/tei:ab[@type='translatio']
          } 
   return  map{
     'meta'    : $meta,

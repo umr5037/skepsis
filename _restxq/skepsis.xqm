@@ -215,11 +215,60 @@ function scepticiHtml() {
     'layout' : 'home.xhtml',
     'pattern' : 'inc_defaultItem.xhtml'
     (: specify an xslt mode and other kind of output options :)
-    }
-    
-    
+    }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
+
+
+declare 
+  %restxq:path('/skepsis/notiones')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function notionesHtml() {
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getNotionesList'
+    }
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'home.xhtml',
+    'pattern' : 'inc_notioItem.xhtml'
+    (: specify an xslt mode and other kind of output options :)
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
+
+
+
+
+declare 
+  %restxq:path('/skepsis/notiones/{$id}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function notioHtml($id) {
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getTextPartByNotio',
+    'id' : $id
+    }
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'home.xhtml',
+    'pattern' : 'inc_chapterItem.xhtml'
+    (: specify an xslt mode and other kind of output options :)
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
+
+
 
 declare 
   %restxq:path('/skepsis/bibl')
