@@ -67,13 +67,19 @@ map {
     }
 };
 
-
+(: TODO : factoriser getTextPartByScepticus et getTextPartByNotio !!!!:)
 
 declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
   let $ref := '#' || map:get($queryParams, 'id')
   let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@corresp contains text {$ref}]/ancestor-or-self::*:ab
   let $meta := map{
-    'title' : 'Sceptique : ' ||  map:get($queryParams, 'id')
+    'title' : 'Sceptique : ' ||  map:get($queryParams, 'id'),
+      'facettes' : <tei:list type="facettes">{
+      for $item in fn:distinct-values(fn:tokenize(fn:translate(fn:string-join($parts/@ana), ' ', ''), '#'))
+       return 
+       let $notio := getNotioById(map:put($queryParams, 'id', $item))
+       return <tei:item ref="{map:get($notio, 'url')}" n="{$item}">{map:get($notio, 'title')}</tei:item>
+  }</tei:list>
     }
   let $content := for $item in $parts return 
           map {
@@ -102,11 +108,11 @@ declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
  : @rmq for testing with new htmlWrapping
  :)
 declare function getNotionesList($queryParams as map(*)) as map(*) {
-  let $notiones := synopsx.lib.commons:getDb($queryParams)//tei:keywords//tei:term
+  let $notiones := synopsx.lib.commons:getDb($queryParams)//tei:keywords//tei:term/@xml:id
   let $meta := map{
     'title' : 'Liste des notions'
     }
-  let $content := for $notio in $notiones return getNotio($notio)
+  let $content := for $notio in $notiones return getNotioById(map:put($queryParams, 'id', $notio))
   return  map{
     'meta'    : $meta,
     'content' : $content
@@ -114,21 +120,34 @@ declare function getNotionesList($queryParams as map(*)) as map(*) {
 };
 
 
-declare function getNotio($item as node()) as map(*){
-        map {
-         'title' : $item/text() ,
-         'id' : $item/@xml:id ,
+declare function getNotioById($queryParams as map(*)*) as map(*){
+   
+        let $id :=  map:get($queryParams, 'id')
+        let $item := synopsx.lib.commons:getDb($queryParams)//tei:keywords//tei:term[@xml:id = $id]
+        let $title := $item/text()
+        let $count := fn:count(synopsx.lib.commons:getDb($queryParams)//tei:*[@ana contains text {'#' || $id}])
+        return map {
+         'title' : $title ,
+         'id' : $id ,
          'tei' : $item,
-         'url' : 'notiones/' || $item/@xml:id
+         'url' : 'notiones/' || $item/@xml:id,
+         'count' : fn:string($count),
+          'weight' : fn:format-number($count, '00')
         }
 };
 
 
 declare function getTextPartByNotio($queryParams as map(*)) as map(*) {
-  let $ref := '#' || map:get($queryParams, 'id')
-  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@ana contains text {$ref}]
+  let $id := map:get($queryParams, 'id')
+  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@ana contains text {'#' || $id}]
   let $meta := map{
-    'title' : 'Notion : ' ||  map:get($queryParams, 'id')
+    'title' : 'Notion : ' ||  synopsx.lib.commons:getDb($queryParams)//tei:keywords//tei:term[@xml:id = $id],
+    'facettes' : <tei:list type="facettes">{
+      for $item in fn:distinct-values(fn:tokenize(fn:translate(fn:string-join($parts/@ana), ' ', ''), '#'))
+       return 
+       let $notio := getNotioById(map:put($queryParams, 'id', $item))
+       return <tei:item ref="{map:get($notio, 'url')}" n="{$item}">{map:get($notio, 'title')}</tei:item>
+  }</tei:list>
     }
   let $content := for $item in $parts return 
           map {
@@ -144,6 +163,44 @@ declare function getTextPartByNotio($queryParams as map(*)) as map(*) {
           'chapitre' :  $item/ancestor::tei:div[@type='chapitre']/fn:data(@n),
           'paragraphe' : getParagraph(map:put($queryParams, 'id', $item/fn:data(@xml:id)))
         }
+  return  map{
+    'meta'    : $meta,
+    'content' : $content
+    }
+};
+
+(:~
+ : TODO : factoriser le calcul de facettes
+ :)
+declare function getChapter($queryParams as map(*)) as map(*) {
+  
+  let $volumen := getTextByTitle($queryParams)
+  let $author := $volumen//tei:titleStmt/tei:author
+  let $title := $volumen//tei:titleStmt/tei:title
+   let $chapitre := getChapterById($queryParams)  
+  let $meta := map{
+    'title' : $title,
+    'author' : $author,
+    'livre' : map:get($queryParams, 'livre'),
+    'chapitre' : map:get($queryParams, 'chapitre')  ,
+     'facettes' : <tei:list type="facettes">{
+      for $item in fn:distinct-values(fn:tokenize(fn:translate(fn:string-join($chapitre//@ana), ' ', ''), '#'))
+       return 
+       let $notio := getNotioById(map:put($queryParams, 'id', $item))
+       return <tei:item ref="{map:get($notio, 'url')}" n="{$item}">{map:get($notio, 'title')}</tei:item>
+  }</tei:list>
+           }
+     
+  let $content :=
+     map {
+          'tei': $chapitre,
+          'gr' : $chapitre/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')],
+          'fr' : $chapitre/tei:*[fn:local-name()='ab' or fn:local-name()='q'][@type='translatio'],
+           'title' : $title,
+    'author' : $author,
+    'livre' : map:get($queryParams, 'livre'),
+    'chapitre' : map:get($queryParams, 'chapitre')  
+         } 
   return  map{
     'meta'    : $meta,
     'content' : $content
@@ -199,40 +256,7 @@ declare function getTextsList($queryParams as map(*)) as map(*) {
     }
 };
 
-(:~
- : this function returns a sequence of map for meta and content
- : !! the result structure has changed to allow sorting early in mapping
- :
- : @rmq for testing with new htmlWrapping
- :)
-declare function getChapter($queryParams as map(*)) as map(*) {
-  
-  let $volumen := getTextByTitle($queryParams)
-  let $author := $volumen//tei:titleStmt/tei:author
-  let $title := $volumen//tei:titleStmt/tei:title
-  
-  let $meta := map{
-    'title' : $title,
-    'author' : $author,
-    'livre' : map:get($queryParams, 'livre'),
-    'chapitre' : map:get($queryParams, 'chapitre')  
-           }
-  let $chapitre := getChapterById($queryParams)      
-  let $content :=
-     map {
-          'tei': $chapitre,
-          'gr' : $chapitre/tei:ab[fn:not(@type='translatio')],
-          'fr' : $chapitre/tei:ab[@type='translatio'],
-           'title' : $title,
-    'author' : $author,
-    'livre' : map:get($queryParams, 'livre'),
-    'chapitre' : map:get($queryParams, 'chapitre')  
-         } 
-  return  map{
-    'meta'    : $meta,
-    'content' : $content
-    }
-};
+
 
 (:~
  : this function returns a sequence of map for meta and content

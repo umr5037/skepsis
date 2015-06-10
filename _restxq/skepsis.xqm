@@ -108,7 +108,7 @@ function textsHtml() {
     }
    let $outputParams := map {
     'lang' : 'fr',
-    'layout' : 'home.xhtml',
+    'layout' : 'volumina.xhtml',
     'pattern' : 'inc_textTitleItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }
@@ -191,7 +191,7 @@ function scepticiHtml() {
     
      let $outputParams := map {
     'lang' : 'fr',
-    'layout' : 'home.xhtml',
+    'layout' : 'sceptici.xhtml',
     'pattern' : 'inc_scepticusItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }  
@@ -210,13 +210,15 @@ function scepticusHtml($id) {
     'dbName' :  $skepsis.webapp:db,
     'model' : 'tei' ,
     'function' : 'getTextPartByScepticus',
-    'id' : $id
+    'id' : $id,
+    'xsl' : 'skepsis.xsl' 
     }
     
      let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
-    'pattern' : 'inc_chapterItem.xhtml'
+    'pattern' : 'inc_chapterItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
@@ -240,7 +242,7 @@ function notionesHtml() {
     
      let $outputParams := map {
     'lang' : 'fr',
-    'layout' : 'home.xhtml',
+    'layout' : 'notiones.xhtml',
     'pattern' : 'inc_notioItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }  
@@ -267,7 +269,8 @@ function notioHtml($id) {
      let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
-    'pattern' : 'inc_chapterItem.xhtml'
+    'pattern' : 'inc_chapterItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
@@ -351,4 +354,27 @@ function biblioListHtml($pattern as xs:string?) {
         
 return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };  
+
+
+declare 
+  %restxq:path('/skepsis/inc/notiones')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function notionesIncHtml() {
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getNotionesList'
+    }
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'inc_defaultAside.xhtml',
+    'pattern' : 'inc_notioNavItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
 

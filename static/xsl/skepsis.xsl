@@ -17,8 +17,12 @@
 
   
     
-    <xsl:template match="*[local-name()='title']">
+    <xsl:template match="*:text//*:title">
         <em><xsl:apply-templates /></em>
+    </xsl:template>
+    
+    <xsl:template match="*:list[@type='facettes']//*:item">
+        <a href="/skepsis/{@ref}" title="Notio : {text()}"><xsl:value-of select="text()"/></a>
     </xsl:template>
 
 </xsl:stylesheet>
