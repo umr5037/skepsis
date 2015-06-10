@@ -60,11 +60,40 @@ declare function getScepticiList($queryParams as map(*)) as map(*) {
 declare function getScepticus($item) as map(*){
 
 map {
-     'title' : $item/tei:persName[1] ,
+     'url' : 'sceptici/' || $item/@xml:id,
+     'fr' : $item/tei:persName[@xml:lang='fr'],
+     'la' : $item/tei:persName[@xml:lang='la'],
      'tei' : $item
     }
 };
 
+
+
+declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
+  let $ref := '#' || map:get($queryParams, 'id')
+  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@corresp contains text {$ref}]/ancestor-or-self::*:ab
+  let $meta := map{
+    'title' : 'Sceptique : ' ||  map:get($queryParams, 'id')
+    }
+  let $content := for $item in $parts return 
+          map {
+         'id' : $item/@xml:id,
+         'type' : $item/@type,
+         'n' : $item/@n,
+         'corresp' : $item/@corresp,
+         'gr': $item,
+          'fr' : synopsx.lib.commons:getDb($queryParams)//tei:*[@corresp = '#' || $item/@xml:id],
+         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author/text(),
+         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title/text(),
+          'livre':$item/ancestor::tei:div[@type='livre']/fn:data(@n),
+          'chapitre' :  $item/ancestor::tei:div[@type='chapitre']/fn:data(@n),
+          'paragraphe' : getParagraph(map:put($queryParams, 'id', $item/fn:data(@xml:id)))
+        }
+  return  map{
+    'meta'    : $meta,
+    'content' : $content
+    }
+};
 
 (:~
  : this function returns a sequence of map for meta and content
@@ -144,22 +173,7 @@ declare function getChapterById($queryParams as map(*)) as node()*{
  synopsx.lib.commons:getDb($queryParams)/tei:TEI[.//tei:titleStmt/tei:title = map:get($queryParams, 'title')]//tei:div[@type="livre" and @n=map:get($queryParams, 'livre')]/tei:div[@type="chapitre" and @n=map:get($queryParams, 'chapitre')]
 };
 
-(: declare function getNextChapter($volumen as node(), $NLivre as xs:string, $NChapitre as xs:string) as map(*){
-            
-      let $livre := $volumen//tei:div[@type="livre" and @n=$NLivre]
-      let $chapitre := $livre//tei:div[@type="chapitre" and @n=$NChapitre]
 
-        let $suivant :=
-        if(not(empty($chapitre/following-sibling::tei:div[@type="chapitre"])))
-        then($chapitre/following-sibling::tei:div[@type="chapitre"][1])
-        else(if(not(empty($livre/following-sibling::tei:div[@type="livre"])))
-             then($livre/following-sibling::tei:div[@type="livre"]/tei:div[@type="chapitre"][1])
-             else())
-      
-      let $content := $volumen/tei:TEI[fn:not(@xml:id = "skepsis")]
-      let $livre := $volumen//tei:div[@type="livre"][1]
-      let $chapitre := $livre//tei:div[@type="chapitre"][1]
-}; :)
 
 
 (:~
@@ -176,8 +190,8 @@ declare function getTextsList($queryParams as map(*)) as map(*) {
      return 
      map {
           'url': "volumina/" || $volumen//tei:titleStmt/tei:title/text(),
-          'author':$volumen//tei:titleStmt/tei:author/text(),
-          'title':$volumen//tei:titleStmt/tei:title/text() 
+          'author':$volumen//tei:titleStmt/tei:author,
+          'title':$volumen//tei:titleStmt/tei:title
          } 
   return  map{
     'meta'    : $meta,
@@ -194,8 +208,8 @@ declare function getTextsList($queryParams as map(*)) as map(*) {
 declare function getChapter($queryParams as map(*)) as map(*) {
   
   let $volumen := getTextByTitle($queryParams)
-  let $author := $volumen//tei:titleStmt/tei:author/text()
-  let $title := $volumen//tei:titleStmt/tei:title/text() 
+  let $author := $volumen//tei:titleStmt/tei:author
+  let $title := $volumen//tei:titleStmt/tei:title
   
   let $meta := map{
     'title' : $title,
@@ -208,7 +222,11 @@ declare function getChapter($queryParams as map(*)) as map(*) {
      map {
           'tei': $chapitre,
           'gr' : $chapitre/tei:ab[fn:not(@type='translatio')],
-          'fr' : $chapitre/tei:ab[@type='translatio']
+          'fr' : $chapitre/tei:ab[@type='translatio'],
+           'title' : $title,
+    'author' : $author,
+    'livre' : map:get($queryParams, 'livre'),
+    'chapitre' : map:get($queryParams, 'chapitre')  
          } 
   return  map{
     'meta'    : $meta,

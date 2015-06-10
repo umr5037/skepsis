@@ -74,40 +74,19 @@ function home() {
     'project' : $skepsis.webapp:project,
     'dbName' :  $skepsis.webapp:db,
     'model' : 'tei' ,
-    'function' : 'getTextsList'
+    'function' : 'getTextById',
+    'id' : 'skepsis'
     }
   let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
-    'pattern' : 'inc_defaultItem.xhtml'
-    (: specify an xslt mode and other kind of output options :)
+    'pattern' : 'inc_defaultItem.xhtml' ,
+    'xsl' : 'skepsis.xsl'
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
 
-(:~
- : this resource function is the corpus resource
- :
- : @return an HTTP message with Content-location against the user-agent request
- : @rmq Content-location in HTTP can be used when a requested resource has 
- : multiple representations. The selection of the resource returned will depend 
- : on the Accept headers in the original GET request.
- : @bug not working curl -I -H "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" http://localhost:8984/corpus/
- :)
-declare 
-  %restxq:path('/skepsis/texts')
-  %rest:produces('application/json')
-  %output:method('json')
-function textsJS() {
-   let $queryParams := map {
-      'project' : $skepsis.webapp:project,     
-      'dbName' : $skepsis.webapp:db,
-      'model' : 'tei',
-      'function' : 'getTextsList'
-    }    
-   let $function := xs:QName(synopsx.lib.commons:getModelFunction($queryParams))
-    return fn:function-lookup($function, 1)($queryParams)
-};
+
 
 (:~
  : this resource function is the html representation of the corpus resource
@@ -130,8 +109,8 @@ function textsHtml() {
    let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
-    'pattern' : 'inc_textTitle.xhtml'
-    (: specify an xslt mode and other kind of output options :)
+    'pattern' : 'inc_textTitleItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
     }
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
@@ -190,8 +169,8 @@ function textHtml($title, $livre, $chapitre) {
    let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
-    'pattern' : 'inc_chapterItem.xhtml'
-    (: specify an xslt mode and other kind of output options :)
+    'pattern' : 'inc_chapterItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
     }
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
@@ -213,11 +192,37 @@ function scepticiHtml() {
      let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
-    'pattern' : 'inc_defaultItem.xhtml'
-    (: specify an xslt mode and other kind of output options :)
+    'pattern' : 'inc_scepticusItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
+
+
+declare 
+  %restxq:path('/skepsis/sceptici/{$id}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function scepticusHtml($id) {
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getTextPartByScepticus',
+    'id' : $id
+    }
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'home.xhtml',
+    'pattern' : 'inc_chapterItem.xhtml'
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
+
+
+
 
 
 declare 
@@ -236,8 +241,8 @@ function notionesHtml() {
      let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
-    'pattern' : 'inc_notioItem.xhtml'
-    (: specify an xslt mode and other kind of output options :)
+    'pattern' : 'inc_notioItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
@@ -263,7 +268,6 @@ function notioHtml($id) {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
     'pattern' : 'inc_chapterItem.xhtml'
-    (: specify an xslt mode and other kind of output options :)
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
@@ -286,8 +290,8 @@ function biblHtml() {
     let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'home.xhtml',
-    'pattern' : 'inc_BiblItem.xhtml'
-    (: specify an xslt mode and other kind of output options :)
+    'pattern' : 'inc_BiblItem.xhtml' ,
+    'xsl' : 'tei2html.xsl' 
     }
     
       
@@ -315,8 +319,8 @@ function corpusListHtml() {
    let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'inc_defaultList.xhtml',
-    'pattern' : 'inc_defaultItem.xhtml'
-    (: specify an xslt mode and other kind of output options :)
+    'pattern' : 'inc_defaultItem.xhtml' ,
+    'xsl' : 'tei2html.xsl' 
     }
    return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
@@ -342,8 +346,7 @@ function biblioListHtml($pattern as xs:string?) {
   let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'inc_defaultList.xhtml',
-    'pattern' : 'inc_RespItem.xhtml'
-    (: specify an xslt mode and other kind of output options :)
+    'pattern' : 'inc_RespItem.xhtml' 
     }
         
 return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)

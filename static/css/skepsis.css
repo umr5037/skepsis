@@ -55,7 +55,7 @@ color: #ab9e71 ;
 }
 
 #primary ul li:before{
-content:"ý  ";
+content:" ";
 color: #ab9e71 ;
 }
 
@@ -63,6 +63,9 @@ color: #ab9e71 ;
 list-style: none;
 }
 
+ul{
+list-style-type: square;
+}
 
 
 

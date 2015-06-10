@@ -17,9 +17,8 @@
 
   
     
-    <xsl:template match="*[local-name()='body']//*[local-name()='title']">
+    <xsl:template match="*[local-name()='title']">
         <em><xsl:apply-templates /></em>
     </xsl:template>
-    
 
 </xsl:stylesheet>
