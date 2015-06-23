@@ -71,7 +71,7 @@ map {
 
 declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
   let $ref := '#' || map:get($queryParams, 'id')
-  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@corresp contains text {$ref}]/ancestor-or-self::*:ab
+  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@corresp contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
   let $meta := map{
     'title' : 'Sceptique : ' ||  map:get($queryParams, 'id'),
       'facettes' : <tei:list type="facettes">{
@@ -139,7 +139,7 @@ declare function getNotioById($queryParams as map(*)*) as map(*){
 
 declare function getTextPartByNotio($queryParams as map(*)) as map(*) {
   let $id := map:get($queryParams, 'id')
-  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@ana contains text {'#' || $id}]
+  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@ana contains text {'#' || $id}][fn:not(ancestor-or-self::*[@type='translatio'])]
   let $meta := map{
     'title' : 'Notion : ' ||  synopsx.lib.commons:getDb($queryParams)//tei:keywords//tei:term[@xml:id = $id],
     'facettes' : <tei:list type="facettes">{

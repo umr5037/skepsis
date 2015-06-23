@@ -73,12 +73,15 @@ milestone{
 
 }
 
+persName{
+  color:#336699;
+}
+
 milestone:after{
 font-size:0.8em;
 font-weight:bold;
 padding:0 3px;
 content:attr(n);
-
 }
 
 bibl:before{
@@ -95,9 +98,31 @@ color:grey;
 content : "]"
 }
 
-.translatio{
-	background-color: rgb(220,220,220);
-	border-color: rgb(150,150,150);
-	margin:1em 0 0 2.5em;
-        padding:1em;
+
+
+
+.citation{
+	background-color: #ffeedd;
+}
+
+.scholarchus{
+		background-color: #eeffdd;
+}
+  
+.fragmentum{
+		background-color: #ddffee;
+}
+    
+.testimonium:before, .excerptum:before{
+    color:#ffffff;
+    background:#aaaaaa;
+    font-size:0.7em;
+    padding:2px;
+}
+.testimonium:before{
+		content:"T";
+}
+
+.excerptum:before{
+		content:"E";
 }

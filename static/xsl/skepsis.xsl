@@ -5,7 +5,7 @@
     <xsl:output method="xml" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
    
-    <xsl:import href="tei2html5.xsl"/>
+    <xsl:include href="tei2html5.xsl"/>
     
     
     <xsl:template match="/">
@@ -15,10 +15,17 @@
 
     </xsl:template>
 
-  
+   <xsl:template match="@type">
+             <xsl:attribute name="class"><xsl:value-of select="."/></xsl:attribute>
+              <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
+    </xsl:template>
     
-    <xsl:template match="*:text//*:title">
-        <em><xsl:apply-templates /></em>
+    <xsl:template match="*:title[not(ancestor::*)]">
+             <xsl:value-of select="text()" />
+    </xsl:template>
+    
+    <xsl:template match="*:title[ancestor::*]">
+                 <em><xsl:apply-templates /></em>
     </xsl:template>
     
     <xsl:template match="*:list[@type='facettes']//*:item">
