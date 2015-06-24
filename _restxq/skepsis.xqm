@@ -30,6 +30,7 @@ import module namespace G = "synopsx.globals" at '../../../globals.xqm' ;
 import module namespace synopsx.lib.commons = 'synopsx.lib.commons' at '../../../lib/commons.xqm' ;
 
 (: Put here all import modules declarations as needed :)
+import module namespace synopsx.models.tei = 'synopsx.models.tei' at '../../../models/tei.xqm' ;
 import module namespace skepsis.models.tei = 'skepsis.models.tei' at '../models/tei.xqm' ;
 
 (: Put here all import declarations for mapping according to models :)
@@ -123,24 +124,49 @@ function textsHtml() {
  : the HTML serialization also shows a bibliographical list
  :)
 declare 
-  %restxq:path('/skepsis/volumina/{$title}')
-  %rest:produces('text/html')
-  %output:method("html")
-  %output:html-version("5.0")
-function textHtml($title) {  
+  %restxq:path('/skepsis/volumina/{$id}/xml')
+  %rest:produces('text/xml')
+function textXml($id) {  
  let $queryParams := map {
     'project' : $skepsis.webapp:project,
     'dbName' :  $skepsis.webapp:db,
     'model' : 'tei' ,
-    'function' : 'getTextByTitle',
-    'title' : $title
+    'function' : 'getTextById',
+    'id' : $id
     }
-    let $text := skepsis.models.tei:getTextByTitle($queryParams)
-     let $premierChapitre := skepsis.models.tei:getFirstChapter($text)
+    let $text := synopsx.models.tei:getTextById($queryParams)
+    let $node := $text('content')('tei')
+    
+     return
+ $node
+};
+
+(:~
+ : this resource function is the html representation of the corpus resource
+ :
+ : @return an html representation of the corpus resource with a bibliographical list
+ : the HTML serialization also shows a bibliographical list
+ :)
+declare 
+  %restxq:path('/skepsis/volumina/{$id}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function textHtml($id) {  
+ let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getTextById',
+    'id' : $id
+    }
+    let $text := synopsx.models.tei:getTextById($queryParams)
+    let $node := $text('content')('tei')
+     let $premierChapitre := skepsis.models.tei:getFirstChapter($node)
      return
   <rest:response>
     <http:response status="303" message="See Other">
-      <http:header name="location" value="/skepsis/volumina/{$title}/livre/{map:get($premierChapitre, 'livre')}/chapitre/{map:get($premierChapitre, 'chapitre')}"/>
+      <http:header name="location" value="/skepsis/volumina/{$id}/livre/{map:get($premierChapitre, 'livre')}/chapitre/{map:get($premierChapitre, 'chapitre')}"/>
     </http:response>
   </rest:response>
 };
@@ -152,17 +178,17 @@ function textHtml($title) {
  : the HTML serialization also shows a bibliographical list
  :)
 declare 
-  %restxq:path('/skepsis/volumina/{$title}/livre/{$livre}/chapitre/{$chapitre}')
+  %restxq:path('/skepsis/volumina/{$id}/livre/{$livre}/chapitre/{$chapitre}')
   %rest:produces('text/html')
   %output:method("html")
   %output:html-version("5.0")
-function textHtml($title, $livre, $chapitre) {  
+function textHtml($id, $livre, $chapitre) {  
     let $queryParams := map {
     'project' : $skepsis.webapp:project,
     'dbName' :  $skepsis.webapp:db,
     'model' : 'tei' ,
     'function' : 'getChapter',
-    'title' : $title,
+    'id' : $id,
     'livre' : $livre,
     'chapitre' : $chapitre
     }
@@ -216,8 +242,8 @@ function scepticusHtml($id) {
     
      let $outputParams := map {
     'lang' : 'fr',
-    'layout' : 'home.xhtml',
-    'pattern' : 'inc_chapterItem.xhtml' ,
+    'layout' : 'sceptici.xhtml',
+    'pattern' : 'inc_textPartItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
@@ -268,8 +294,8 @@ function notioHtml($id) {
     
      let $outputParams := map {
     'lang' : 'fr',
-    'layout' : 'home.xhtml',
-    'pattern' : 'inc_chapterItem.xhtml' ,
+    'layout' : 'notiones.xhtml',
+    'pattern' : 'inc_textPartItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
