@@ -84,16 +84,16 @@ declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
   let $content := for $item in $parts return 
           map {
          'id' : fn:data($item/@xml:id),
-         'type' : $item/@type,
-         'n' : $item/@n,
-         'corresp' : $item/@corresp,
+         'type' : fn:data($item/@type),
+         'n' : fn:data($item/@n),
+         'corresp' : fn:data($item/@corresp),
          'gr': $item,
           'fr' : synopsx.lib.commons:getDb($queryParams)//tei:*[@corresp = '#' || $item/@xml:id],
-         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author/text(),
-         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title/text(),
-          'livre':$item/ancestor::tei:div[@type='livre']/fn:data(@n),
-          'chapitre' :  $item/ancestor::tei:div[@type='chapitre']/fn:data(@n),
-          'paragraphe' : fn:trace(getParagraph(map:put($queryParams, 'id', $item/fn:data(@xml:id))))
+         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author,
+         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title,
+          'livre':fn:data($item/ancestor::tei:div[@type='livre']/@n),
+          'chapitre' :  fn:data($item/ancestor::tei:div[@type='chapitre']/@n),
+          'paragraphe' : fn:data(getParagraph(map:put($queryParams, 'id', $item/@xml:id)))
         }
   return  map{
     'meta'    : $meta,
@@ -151,17 +151,17 @@ declare function getTextPartByNotio($queryParams as map(*)) as map(*) {
     }
   let $content := for $item in $parts return 
           map {
-         'id' : $item/@xml:id,
-         'type' : $item/@type,
-         'n' : $item/@n,
-         'corresp' : $item/@corresp,
+         'id' : fn:data($item/@xml:id),
+         'type' : fn:data($item/@type),
+         'n' :fn:data($item/@n),
+         'corresp' : fn:data($item/@corresp),
          'gr': $item,
           'fr' : synopsx.lib.commons:getDb($queryParams)//tei:*[@corresp = '#' || $item/@xml:id],
-         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author/text(),
-         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title/text(),
-          'livre':$item/ancestor::tei:div[@type='livre']/fn:data(@n),
-          'chapitre' :  $item/ancestor::tei:div[@type='chapitre']/fn:data(@n),
-          'paragraphe' : getParagraph(map:put($queryParams, 'id', $item/fn:data(@xml:id)))
+         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author,
+         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title,
+          'livre':fn:data($item/ancestor::tei:div[@type='livre']/@n),
+          'chapitre' :  fn:data($item/ancestor::tei:div[@type='chapitre']/@n),
+          'paragraphe' : fn:data(getParagraph(map:put($queryParams, 'id', $item/@xml:id)))
         }
   return  map{
     'meta'    : $meta,
