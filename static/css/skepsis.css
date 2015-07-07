@@ -84,22 +84,28 @@ padding:0 3px;
 content:attr(n);
 }
 
-bibl:before{
-color:grey;
-content : "[Ref. "
+.textPart{
+  margin: 15px 0;
 }
 
-bibl{
-color:grey;
+header.linkPlus{
+  cursor:pointer;
 }
 
-bibl:after{
-color:grey;
-content : "]"
+.textType{
+   text-transform: capitalize;
+}
+
+.bibl{
+//display:none;
 }
 
 
 
+
+.testimonium{
+	background-color: #ddeeff;
+}
 
 .citation{
 	background-color: #ffeedd;
@@ -108,21 +114,23 @@ content : "]"
 .scholarchus{
 		background-color: #eeffdd;
 }
-  
+
 .fragmentum{
 		background-color: #ddffee;
 }
     
-.testimonium:before, .excerptum:before{
+.testimonium:before, .fragmentum:before{
     color:#ffffff;
     background:#aaaaaa;
     font-size:0.7em;
-    padding:2px;
+    padding:3px;
+     cursor: help;
 }
+
 .testimonium:before{
 		content:"T";
 }
 
-.excerptum:before{
-		content:"E";
-}
+.fragmentum:before{
+		content:"F";
+} 

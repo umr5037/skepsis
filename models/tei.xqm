@@ -71,7 +71,7 @@ map {
 
 declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
   let $ref := '#' || map:get($queryParams, 'id')
-  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[(@corresp | @source) contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
+  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:*[(@corresp | @source) contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
   let $meta := map{
     'title' : 'Sceptique : ' ||  map:get($queryParams, 'id'),
       'facettes' : <tei:list type="facettes">{
@@ -84,6 +84,7 @@ declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
   let $content := for $item in $parts return 
           map {
          'id' : fn:data($item/@xml:id),
+         'bibl' : $item/*:bibl,
          'type' : fn:data($item/@type),
          'n' : fn:data($item/@n),
          'corresp' : fn:data($item/@corresp),

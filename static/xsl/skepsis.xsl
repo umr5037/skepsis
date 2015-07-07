@@ -9,15 +9,17 @@
     
     
     <xsl:template match="/">
-
         <xsl:apply-templates/>
-      
-
     </xsl:template>
 
+<xsl:template match="*:ab | *:q">
+<span>
+<xsl:attribute name="title">Ref. : <xsl:value-of select="*:bibl"/></xsl:attribute>
+<xsl:apply-templates select="@*|node()"/>
+</span>
+</xsl:template>
    <xsl:template match="@type">
-             <xsl:attribute name="class"><xsl:value-of select="."/></xsl:attribute>
-              <xsl:attribute name="title"><xsl:value-of select="."/></xsl:attribute>
+             <xsl:attribute name="class"><xsl:value-of select="."/></xsl:attribute>  
     </xsl:template>
     
     <xsl:template match="*:title[not(ancestor::*)]">
@@ -29,6 +31,9 @@
     </xsl:template>
     
 
+ <xsl:template match="*:bibl" /> 
+   
+   
     <xsl:template match="*:title[ancestor::*]">
                  <em><xsl:apply-templates /></em>
     </xsl:template>
