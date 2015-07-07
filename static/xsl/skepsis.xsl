@@ -14,7 +14,7 @@
 
 <xsl:template match="*:ab | *:q">
 <span>
-<xsl:attribute name="title">Ref. : <xsl:value-of select="*:bibl"/></xsl:attribute>
+<xsl:attribute name="title">Ref. :  <xsl:value-of select="@xml:id"/><xsl:text>&#xA;</xsl:text><xsl:value-of select="*:bibl"/></xsl:attribute>
 <xsl:apply-templates select="@*|node()"/>
 </span>
 </xsl:template>
