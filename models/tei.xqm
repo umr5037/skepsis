@@ -71,7 +71,7 @@ map {
 
 declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
   let $ref := '#' || map:get($queryParams, 'id')
-  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@* contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
+  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:div//tei:*[@corresp contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
   let $meta := map{
     'title' : 'Sceptique : ' ||  map:get($queryParams, 'id'),
       'facettes' : <tei:list type="facettes">{
@@ -83,7 +83,7 @@ declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
     }
   let $content := for $item in $parts return 
           map {
-         'id' : $item/@xml:id,
+         'id' : fn:data($item/@xml:id),
          'type' : $item/@type,
          'n' : $item/@n,
          'corresp' : $item/@corresp,
@@ -93,7 +93,7 @@ declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
          'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title/text(),
           'livre':$item/ancestor::tei:div[@type='livre']/fn:data(@n),
           'chapitre' :  $item/ancestor::tei:div[@type='chapitre']/fn:data(@n),
-          'paragraphe' : getParagraph(map:put($queryParams, 'id', $item/fn:data(@xml:id)))
+          'paragraphe' : fn:trace(getParagraph(map:put($queryParams, 'id', $item/fn:data(@xml:id))))
         }
   return  map{
     'meta'    : $meta,
@@ -209,6 +209,7 @@ declare function getChapter($queryParams as map(*)) as map(*) {
      map {
        'id' : fn:data($volumen/@xml:id),
           'tei': $chapitre,
+   'type' : fn:data($chapitre/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')]/@type),
           'gr' : $chapitre/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')],
           'fr' : $chapitre/tei:*[fn:local-name()='ab' or fn:local-name()='q'][@type='translatio'],
            'title' : $title,
@@ -227,12 +228,13 @@ declare function getChapter($queryParams as map(*)) as map(*) {
 };
 
 declare function getParagraph($queryParams as map(*))  {
-  let $textPartId :=  map:get($queryParams, 'id')
-  let $tei := synopsx.lib.commons:getDb($queryParams)//tei:div[tei:*[@xml:id = $textPartId]]
+  let $textPartId :=  fn:trace(map:get($queryParams, 'id'))
+  let $tei := synopsx.lib.commons:getDb($queryParams)//tei:TEI[.//tei:*[@xml:id = $textPartId]]
   let $textPart := $tei//tei:*[@xml:id = $textPartId]
-  let $paragraph := $textPart/*:milestone[1]/fn:data(@n)
-  return if(fn:empty($paragraph) || fn:not(fn:normalize-space($textPart/*:milestone[1]/fn:string-join(preceding-sibling::text())) = '')) then $tei//tei:*[@xml:id = $textPartId]//preceding::*:milestone[1]/fn:data(@n)
-          else $paragraph 
+  let $paragraph := fn:trace(($textPart/*:milestone)[1]/fn:data(@n))
+  (: toto : quand texte avant le milestone, milestone précedent :)
+  return if(fn:not(fn:empty($paragraph)) and  fn:normalize-space(($textPart/*:milestone)[1]/fn:string-join(preceding-sibling::text())) = '' ) then $paragraph 
+          else $tei//tei:*[@xml:id = $textPartId]//(preceding::*:milestone)[1]/fn:data(@n) 
           
 };
 

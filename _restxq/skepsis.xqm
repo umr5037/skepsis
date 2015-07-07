@@ -194,7 +194,7 @@ function textHtml($id, $livre, $chapitre) {
     }
    let $outputParams := map {
     'lang' : 'fr',
-    'layout' : 'home.xhtml',
+    'layout' : 'volumina.xhtml',
     'pattern' : 'inc_chapterItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }

@@ -5,7 +5,7 @@
     <xsl:output method="xml" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
    
-    <xsl:include href="tei2html5.xsl"/>
+    <xsl:import href="tei2html5.xsl"/>
     
     
     <xsl:template match="/">
@@ -23,7 +23,12 @@
     <xsl:template match="*:title[not(ancestor::*)]">
              <xsl:value-of select="text()" />
     </xsl:template>
+  
+    <xsl:template match="*:gap">
+                [— — —]
+    </xsl:template>
     
+
     <xsl:template match="*:title[ancestor::*]">
                  <em><xsl:apply-templates /></em>
     </xsl:template>
