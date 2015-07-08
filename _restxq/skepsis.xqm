@@ -325,7 +325,29 @@ function notioHtml($id) {
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
 
-
+declare 
+  %restxq:path('/skepsis/notiones/{$id}/scepticus/{$scepticus}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function notioHtml($id, $scepticus) {
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'scepticus' : $scepticus,
+    'function' : 'getTextPartByNotio',
+    'id' : $id
+    }
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'notiones.xhtml',
+    'pattern' : 'inc_textPartItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
 
 declare 
   %restxq:path('/skepsis/bibl')
@@ -427,6 +449,8 @@ function notionesIncHtml() {
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
+
+
 
 declare 
   %restxq:path('/skepsis/inc/notiones/scepticus/{$scepticus}')
