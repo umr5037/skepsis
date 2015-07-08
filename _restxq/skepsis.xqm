@@ -243,14 +243,37 @@ function scepticusHtml($id) {
     
      let $outputParams := map {
     'lang' : 'fr',
-    'layout' : 'sceptici.xhtml',
+    'layout' : 'scepticus.xhtml',
     'pattern' : 'inc_textPartItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
 
-
+declare 
+  %restxq:path('/skepsis/sceptici/{$id}/notio/{$notio}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function scepticusHtml($id,$notio) {
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getTextPartByScepticus',
+    'id' : $id,
+    'notio' : $notio,
+    'xsl' : 'skepsis.xsl' 
+    }
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'scepticus.xhtml',
+    'pattern' : 'inc_textPartItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
 
 
 
@@ -405,3 +428,25 @@ function notionesIncHtml() {
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
 
+declare 
+  %restxq:path('/skepsis/inc/notiones/scepticus/{$scepticus}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function notionesIncHtml($scepticus) {
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'scepticus' : $scepticus,
+    'function' : 'getNotionesList'
+    }
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'inc_defaultAside.xhtml',
+    'pattern' : 'inc_notioNavItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};

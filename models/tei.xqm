@@ -70,16 +70,17 @@ map {
 (: TODO : factoriser getTextPartByScepticus et getTextPartByNotio !!!!:)
 
 declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
-  let $ref := '#' || map:get($queryParams, 'id')
+  let $ref := '#' ||  $queryParams('id')
   let $parts := synopsx.lib.commons:getDb($queryParams)//tei:*[(@corresp | @source) contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
+  let $notio :=  $queryParams('notio')
+  let $parts := if (fn:empty($notio))
+  then  $parts
+  else
+   let $notio :=  '#' || $notio
+   return $parts[ancestor-or-self::*[@ana contains text {$notio}]]
   let $meta := map{
-    'title' : 'Sceptique : ' ||  map:get($queryParams, 'id'),
-      'facettes' : <tei:list type="facettes">{
-      for $item in fn:distinct-values(fn:tokenize(fn:translate(fn:string-join($parts/@ana), ' ', ''), '#'))
-       return 
-       let $notio := getNotioById(map:put($queryParams, 'id', $item))
-       return <tei:item ref="{map:get($notio, 'url')}" n="{$item}">{map:get($notio, 'title')}</tei:item>
-  }</tei:list>
+    'title' : 'Sceptique : ' ||  $queryParams('id'),
+    'scepticus'  : $queryParams('id')
     }
   let $content := for $item in $parts return 
          getTextPartMap($item)
@@ -97,6 +98,15 @@ declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
  :)
 declare function getNotionesList($queryParams as map(*)) as map(*) {
   let $notiones := synopsx.lib.commons:getDb($queryParams)//tei:keywords//tei:term/@xml:id
+  let $notiones := if (fn:empty($queryParams('scepticus')))
+    then $notiones
+    else
+      let $scepticus := '#' || $queryParams('scepticus')
+      let $corpus := synopsx.lib.commons:getDb($queryParams)//tei:div
+        for $notio in $notiones
+        let $label := '#' || $notio
+        where $corpus//tei:*[@ana contains text {$label}][descendant-or-self::*[@source contains text {$scepticus} or @corresp contains text {$scepticus}]]
+        return $notio
   let $meta := map{
     'title' : 'Liste des notions'
     }
