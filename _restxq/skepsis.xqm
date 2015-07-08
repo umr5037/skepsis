@@ -162,11 +162,11 @@ function textHtml($id) {
     }
     let $text := synopsx.models.tei:getTextById($queryParams)
     let $node := $text('content')('tei')
-     let $premierChapitre := skepsis.models.tei:getFirstChapter($node)
+    let $firstSubSection := skepsis.models.tei:getFirstSubSection($node)
      return
   <rest:response>
     <http:response status="303" message="See Other">
-      <http:header name="location" value="/skepsis/volumina/{$id}/livre/{map:get($premierChapitre, 'livre')}/chapitre/{map:get($premierChapitre, 'chapitre')}"/>
+      <http:header name="location" value="/skepsis/volumina/{$id}/livre/{map:get($firstSubSection, 'livre')}/{map:get($firstSubSection, 'type')}/{map:get($firstSubSection, 'subSection')}"/>
     </http:response>
   </rest:response>
 };
@@ -178,24 +178,25 @@ function textHtml($id) {
  : the HTML serialization also shows a bibliographical list
  :)
 declare 
-  %restxq:path('/skepsis/volumina/{$id}/livre/{$livre}/chapitre/{$chapitre}')
+  %restxq:path('/skepsis/volumina/{$id}/livre/{$livre}/{$type}/{$subSection}')
   %rest:produces('text/html')
   %output:method("html")
   %output:html-version("5.0")
-function textHtml($id, $livre, $chapitre) {  
+function textHtml($id, $livre, $subSection,$type) {  
     let $queryParams := map {
     'project' : $skepsis.webapp:project,
     'dbName' :  $skepsis.webapp:db,
     'model' : 'tei' ,
-    'function' : 'getChapter',
+    'function' : 'getSubSection',
     'id' : $id,
     'livre' : $livre,
-    'chapitre' : $chapitre
+    'subSection' : $subSection,
+    'type' : $type
     }
    let $outputParams := map {
     'lang' : 'fr',
     'layout' : 'volumina.xhtml',
-    'pattern' : 'inc_chapterItem.xhtml' ,
+    'pattern' : 'inc_subSectionItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)

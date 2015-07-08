@@ -82,20 +82,7 @@ declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
   }</tei:list>
     }
   let $content := for $item in $parts return 
-          map {
-         'id' : fn:data($item/@xml:id),
-         'bibl' : $item/*:bibl,
-         'type' : fn:data($item/@type),
-         'n' : fn:data($item/@n),
-         'corresp' : fn:data($item/@corresp),
-         'gr': $item,
-          'fr' : synopsx.lib.commons:getDb($queryParams)//tei:*[@corresp = '#' || $item/@xml:id],
-         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author,
-         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title,
-          'livre':fn:data($item/ancestor::tei:div[@type='livre']/@n),
-          'chapitre' :  fn:data($item/ancestor::tei:div[@type='chapitre']/@n),
-          'paragraphe' : fn:data(getParagraph(map:put($queryParams, 'id', $item/@xml:id)))
-        }
+         getTextPartMap($item)
   return  map{
     'meta'    : $meta,
     'content' : $content
@@ -151,19 +138,7 @@ declare function getTextPartByNotio($queryParams as map(*)) as map(*) {
   }</tei:list>
     }
   let $content := for $item in $parts return 
-          map {
-         'id' : fn:data($item/@xml:id),
-         'type' : fn:data($item/@type),
-         'n' :fn:data($item/@n),
-         'corresp' : fn:data($item/@corresp),
-         'gr': $item,
-          'fr' : synopsx.lib.commons:getDb($queryParams)//tei:*[@corresp = '#' || $item/@xml:id],
-         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author,
-         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title,
-          'livre':fn:data($item/ancestor::tei:div[@type='livre']/@n),
-          'chapitre' :  fn:data($item/ancestor::tei:div[@type='chapitre']/@n),
-          'paragraphe' : fn:data(getParagraph(map:put($queryParams, 'id', $item/@xml:id)))
-        }
+          getTextPartMap($item)
   return  map{
     'meta'    : $meta,
     'content' : $content
@@ -173,33 +148,33 @@ declare function getTextPartByNotio($queryParams as map(*)) as map(*) {
 (:~
  : TODO : factoriser le calcul de facettes
  :)
-declare function getChapter($queryParams as map(*)) as map(*) { 
+declare function getSubSection($queryParams as map(*)) as map(*) { 
   let $volumen := synopsx.models.tei:getTextById($queryParams)('content')('tei')
   let $author := $volumen//tei:titleStmt/tei:author
   let $title := $volumen//tei:titleStmt/tei:title
-   let $chapitre := getChapterById($queryParams)  
-   let $livre := $chapitre/ancestor::*[@type='livre']
+   let $subSection := getSubSectionById($queryParams)  
+   let $livre := $subSection/ancestor::*[@type='livre']
    
-   let  $previousChapter :=
-        if(fn:not(fn:empty($chapitre/preceding-sibling::tei:div[@type="chapitre"])))
-        then($chapitre/preceding-sibling::tei:div[@type="chapitre"][fn:last()])
+   let  $previousSubSection :=
+        if(fn:not(fn:empty($subSection/preceding-sibling::tei:div[$queryParams('type')])))
+        then($subSection/preceding-sibling::tei:div[$queryParams('type')][fn:last()])
         else(if(fn:not(fn:empty($livre/preceding-sibling::tei:div[@type="livre"])))
-             then($livre/preceding-sibling::tei:div[@type="livre"]/tei:div[@type="chapitre"][fn:last()])
+             then($livre/preceding-sibling::tei:div[@type="livre"]/tei:div[$queryParams('type')][fn:last()])
              else())
 
-      let $nextChapter :=
-        if(fn:not(fn:empty($chapitre/following-sibling::tei:div[@type="chapitre"])))
-        then($chapitre/following-sibling::tei:div[@type="chapitre"][1])
+      let $nextSubSection :=
+        if(fn:not(fn:empty($subSection/following-sibling::tei:div[$queryParams('type')])))
+        then($subSection/following-sibling::tei:div[$queryParams('type')][1])
         else(if(fn:not(fn:empty($livre/following-sibling::tei:div[@type="livre"])))
-             then($livre/following-sibling::tei:div[@type="livre"]/tei:div[@type="chapitre"][1])
+             then($livre/following-sibling::tei:div[@type="livre"]/tei:div[$queryParams('type')][1])
              else())
   let $meta := map{
     'title' : $title,
     'author' : $author,
     'livre' : map:get($queryParams, 'livre'),
-    'chapitre' : map:get($queryParams, 'chapitre')  ,
+    'subSection' : $queryParams('subSection')  ,
      'facettes' : <tei:list type="facettes">{
-      for $item in fn:distinct-values(fn:tokenize(fn:translate(fn:string-join($chapitre//@ana), ' ', ''), '#'))
+      for $item in fn:distinct-values(fn:tokenize(fn:translate(fn:string-join($subSection//@ana), ' ', ''), '#'))
        return 
        let $notio := getNotioById(map:put($queryParams, 'id', $item))
        return <tei:item ref="{map:get($notio, 'url')}" n="{$item}">{map:get($notio, 'title')}</tei:item>
@@ -209,18 +184,18 @@ declare function getChapter($queryParams as map(*)) as map(*) {
   let $content :=
      map {
        'id' : fn:data($volumen/@xml:id),
-          'tei': $chapitre,
-   'type' : fn:data($chapitre/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')]/@type),
-          'gr' : $chapitre/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')],
-          'fr' : $chapitre/tei:*[fn:local-name()='ab' or fn:local-name()='q'][@type='translatio'],
+          'tei': $subSection,
+   'type' : fn:data($subSection/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')]/@type),
+          'gr' : $subSection/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')],
+          'fr' : $subSection/tei:*[fn:local-name()='ab' or fn:local-name()='q'][@type='translatio'],
            'title' : $title,
     'author' : $author,
     'livre' : map:get($queryParams, 'livre'),
-    'chapitre' : map:get($queryParams, 'chapitre')  ,
-    'nextLivre' : fn:data($nextChapter/ancestor::*[@type='livre']/@n),
-     'prevLivre' : fn:data($previousChapter/ancestor::*[@type='livre']/@n),
-     'nextChapter' : fn:data($nextChapter/@n),
-    'prevChapter' : fn:data($previousChapter//@n)
+    'subSection' : $queryParams('subSection')  ,
+    'nextLivre' : fn:data($nextSubSection/ancestor::*[@type='livre']/@n),
+     'prevLivre' : fn:data($previousSubSection/ancestor::*[@type='livre']/@n),
+     'nextSubSection' : fn:data($nextSubSection/@n),
+    'prevSubSection' : fn:data($previousSubSection//@n)
          } 
   return  map{
     'meta'    : $meta,
@@ -228,10 +203,9 @@ declare function getChapter($queryParams as map(*)) as map(*) {
     }
 };
 
-declare function getParagraph($queryParams as map(*))  {
-  let $textPartId :=  fn:trace(map:get($queryParams, 'id'))
-  let $tei := synopsx.lib.commons:getDb($queryParams)//tei:TEI[.//tei:*[@xml:id = $textPartId]]
-  let $textPart := $tei//tei:*[@xml:id = $textPartId]
+declare function getParagraph($textPart as node())  {
+  let $textPartId :=  fn:trace($textPart/@xml:id)
+  let $tei := $textPart//ancestor::tei:TEI
   let $paragraph := fn:trace(($textPart/*:milestone)[1]/fn:data(@n))
   (: toto : quand texte avant le milestone, milestone précedent :)
   return if(fn:not(fn:empty($paragraph)) and  fn:normalize-space(($textPart/*:milestone)[1]/fn:string-join(preceding-sibling::text())) = '' ) then $paragraph 
@@ -239,17 +213,18 @@ declare function getParagraph($queryParams as map(*))  {
           
 };
 
-declare function getFirstChapter($volumen as node()) as map(*){
-   let $premierLivre := $volumen//tei:div[@type="livre"][1]
-   let $premierChapitre := $premierLivre//tei:div[@type="chapitre"][1]
+declare function getFirstSubSection($volumen as node()) as map(*){
+   let $firstBook := $volumen//tei:div[@type="livre"][1]
+   let $firstSubSection := $firstBook/tei:div[1]
    return map{
-     'livre' : $premierLivre/fn:data(@n),
-     'chapitre' : $premierChapitre/fn:data(@n)
+     'livre' : fn:data($firstBook/@n),
+     'subSection' : fn:data($firstSubSection/@n),
+     'type':fn:data($firstSubSection/@type)
    }
 };
 
-declare function getChapterById($queryParams as map(*)) as node()*{
- synopsx.lib.commons:getDb($queryParams)/tei:TEI[@xml:id = $queryParams('id')]//tei:div[@type="livre" and @n=map:get($queryParams, 'livre')]/tei:div[@type="chapitre" and @n=map:get($queryParams, 'chapitre')]
+declare function getSubSectionById($queryParams as map(*)) as node()*{
+ synopsx.lib.commons:getDb($queryParams)/tei:TEI[@xml:id = $queryParams('id')]//tei:div[@type="livre" and @n=map:get($queryParams, 'livre')]/tei:div[$queryParams('type') and @n=$queryParams('subSection')]
 };
 
 
@@ -288,4 +263,26 @@ declare function getTextsList($queryParams as map(*)) as map(*) {
  :)
 declare function getTextByTitle($queryParams as map(*)) as node()* {
    synopsx.lib.commons:getDb($queryParams)/tei:TEI[.//tei:titleStmt/tei:title = map:get($queryParams, 'title')]          
+};
+
+
+(:~
+ : this function returns a map for discribing a text part
+ : @rmq for testing with new htmlWrapping
+ :)
+declare function getTextPartMap($item as node()) as map(*) {
+ 
+          map {
+         'id' : fn:data($item/@xml:id),
+         'type' : fn:data($item/@type),
+         'n' :fn:data($item/@n),
+         'corresp' : fn:data($item/@corresp),
+         'gr': $item,
+          'fr' : $item/ancestor::tei:div//tei:*[@corresp = '#' || $item/@xml:id],
+         'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author,
+         'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title,
+          'livre':fn:data($item/ancestor::tei:div[@type='livre']/@n),
+          'subSection' :  fn:data($item/ancestor::tei:div/@n),
+          'paragraphe' : fn:data(getParagraph($item))
+        }        
 };
