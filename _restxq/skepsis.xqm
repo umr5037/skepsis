@@ -172,6 +172,44 @@ function textHtml($id) {
 };
 
 (:~
+ : this resource function redirect to /home
+ :
+ :)
+declare 
+  %restxq:path("/skepsis/sceptici/Sextus")
+function sextus() {
+  <rest:response>
+    <http:response status="303" message="See Other">
+      <http:header name="location" value="/skepsis/volumina/Sextus"/>
+    </http:response>
+  </rest:response>
+};
+
+declare 
+  %restxq:path('/skepsis/volumina/Sextus')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function textHtml() {  
+ let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getTextsListByAuthor',
+    'id' : 'Sextus'
+    }
+   let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'volumina.xhtml',
+    'pattern' : 'inc_textTitleItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
+    }
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
+
+
+
+(:~
  : this resource function is the html representation of the corpus resource
  :
  : @return an html representation of the corpus resource with a bibliographical list
@@ -249,6 +287,7 @@ function scepticusHtml($id) {
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
+
 
 declare 
   %restxq:path('/skepsis/sceptici/{$id}/notiones/{$notio}')

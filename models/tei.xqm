@@ -126,7 +126,7 @@ declare function getNotioById($queryParams as map(*)*) as map(*){
         let $scepticus := $queryParams('scepticus')
         let $url := if (fn:empty($scepticus)) 
                     then  'notiones/' || $item/@xml:id 
-                    else  'notiones/' || $item/@xml:id || '/scepticus/' || $scepticus
+                    else  'sceptici/' || $scepticus || '/notiones/' || $item/@xml:id  
         let $count := if (fn:empty($scepticus)) 
                       then fn:count(synopsx.lib.commons:getDb($queryParams)//tei:*[@ana contains text {'#' || $id}])
                       else fn:count(synopsx.lib.commons:getDb($queryParams)//tei:*[@ana contains text {'#' || $id}][descendant-or-self::*[@source contains text {$scepticus} or @corresp contains text {$scepticus}]])
@@ -269,7 +269,28 @@ declare function getTextsList($queryParams as map(*)) as map(*) {
     }
 };
 
-
+(:~
+ : this function returns a sequence of map for meta and content
+ : !! the result structure has changed to allow sorting early in mapping
+ :
+ : @rmq for testing with new htmlWrapping
+ :)
+declare function getTextsListByAuthor($queryParams as map(*)) as map(*) {
+  let $meta := map{
+    'title' : 'Liste des textes'
+    }
+  let $content := for $volumen in synopsx.lib.commons:getDb($queryParams)/tei:TEI[fn:not(@xml:id = "skepsis")][tei:teiHeader/tei:fileDesc/tei:titleStmt/tei:author/@key contains text {$queryParams('id')}]    
+     return 
+     map {
+          'url': "volumina/" || $volumen/@xml:id,
+          'author':$volumen//tei:titleStmt/tei:author,
+          'title':$volumen//tei:titleStmt/tei:title
+         } 
+  return  map{
+    'meta'    : $meta,
+    'content' : $content
+    }
+};
 
 (:~
  : this function returns a sequence of map for meta and content
@@ -298,7 +319,7 @@ declare function getTextPartMap($item as node()) as map(*) {
          'author' : $item/ancestor::tei:TEI//tei:titleStmt/tei:author,
          'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title,
           'livre':fn:data($item/ancestor::tei:div[@type='livre']/@n),
-          'subSection' :  fn:data($item/ancestor::tei:div/@n),
+          'subSection' :  fn:data($item/ancestor::tei:div[1]/@n),
           'paragraphe' : fn:data(getParagraph($item))
         }        
 };
