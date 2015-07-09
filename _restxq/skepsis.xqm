@@ -251,7 +251,7 @@ function scepticusHtml($id) {
 };
 
 declare 
-  %restxq:path('/skepsis/sceptici/{$id}/notio/{$notio}')
+  %restxq:path('/skepsis/sceptici/{$id}/notiones/{$notio}')
   %rest:produces('text/html')
   %output:method("html")
   %output:html-version("5.0")
@@ -326,7 +326,7 @@ function notioHtml($id) {
 };
 
 declare 
-  %restxq:path('/skepsis/notiones/{$id}/scepticus/{$scepticus}')
+  %restxq:path('/skepsis/notiones/{$id}/sceptici/{$scepticus}')
   %rest:produces('text/html')
   %output:method("html")
   %output:html-version("5.0")
@@ -453,7 +453,7 @@ function notionesIncHtml() {
 
 
 declare 
-  %restxq:path('/skepsis/inc/notiones/scepticus/{$scepticus}')
+  %restxq:path('/skepsis/inc/notiones/sceptici/{$scepticus}')
   %rest:produces('text/html')
   %output:method("html")
   %output:html-version("5.0")
