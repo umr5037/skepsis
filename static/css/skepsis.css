@@ -74,7 +74,7 @@ milestone{
 }
 
 persName{
-  color:#336699;
+  color:#897c49;
 }
 
 milestone:after{
@@ -104,19 +104,15 @@ header.linkPlus{
 
 
 .testimonium{
-	background-color: #ddeeff;
+	background-color: #ededdc;
 }
 
-.citation{
-	background-color: #ffeedd;
+.fragmentum, .citation{
+	font-style:italic;
 }
 
 .scholarchus{
-		background-color: #eeffdd;
-}
-
-.fragmentum{
-		font-style:italic;
+		background-color: #eee;
 }
     
 .testimonium:before, .fragmentum:before{
@@ -124,7 +120,7 @@ header.linkPlus{
     background:#aaaaaa;
     font-size:0.7em;
     padding:3px;
-     cursor: help;
+    cursor: help;
 }
 
 .testimonium:before{
