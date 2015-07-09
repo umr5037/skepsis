@@ -120,15 +120,21 @@ declare function getNotionesList($queryParams as map(*)) as map(*) {
 
 declare function getNotioById($queryParams as map(*)*) as map(*){
    
-        let $id :=  map:get($queryParams, 'id')
+        let $id :=  $queryParams('id')
         let $item := synopsx.lib.commons:getDb($queryParams)//tei:keywords//tei:term[@xml:id = $id]
         let $title := $item/text()
-        let $count := fn:count(synopsx.lib.commons:getDb($queryParams)//tei:*[@ana contains text {'#' || $id}])
+        let $scepticus := $queryParams('scepticus')
+        let $url := if (fn:empty($scepticus)) 
+                    then  'notiones/' || $item/@xml:id 
+                    else  'notiones/' || $item/@xml:id || '/scepticus/' || $scepticus
+        let $count := if (fn:empty($scepticus)) 
+                      then fn:count(synopsx.lib.commons:getDb($queryParams)//tei:*[@ana contains text {'#' || $id}])
+                      else fn:count(synopsx.lib.commons:getDb($queryParams)//tei:*[@ana contains text {'#' || $id}][descendant-or-self::*[@source contains text {$scepticus} or @corresp contains text {$scepticus}]])
         return map {
          'title' : $title ,
          'id' : $id ,
          'tei' : $item,
-         'url' : 'notiones/' || $item/@xml:id,
+         'url' : $url,
          'count' : fn:string($count),
           'weight' : fn:format-number($count, '00')
         }
