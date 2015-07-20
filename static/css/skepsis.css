@@ -13,6 +13,16 @@ font-size:1em;
 font-family: 'GFS Didot', serif;
 }
 
+button{
+  display:block;
+  float:right;
+  height:18px;
+}
+
+button.tei{
+  margin : 0 300px 0 0;
+}
+
 #primary-nav.container{
 	background: #ab9e71 ;
 	color:#fff;
@@ -69,12 +79,15 @@ list-style-type: square;
 
 
 
-milestone{
 
-}
+
 
 persName{
   color:#897c49;
+}
+
+milestone{
+
 }
 
 milestone:after{
@@ -84,12 +97,22 @@ padding:0 3px;
 content:attr(n);
 }
 
+
+
+.title{
+  font-weight:bold;
+}
+
 .textPart{
   margin: 15px 0;
 }
 
 header.linkPlus{
   cursor:pointer;
+}
+
+.page{
+  display:none;
 }
 
 .textType{
@@ -104,6 +127,7 @@ header.linkPlus{
 
 
 .testimonium{
+<<<<<<< HEAD
 	background-color: #ededdc;
 }
 
@@ -113,6 +137,21 @@ header.linkPlus{
 
 .scholarchus{
 		background-color: #eee;
+=======
+	
+}
+
+.citation{
+		font-style:italic;
+}
+
+.scholarchus{
+
+}
+
+.fragmentum{
+
+>>>>>>> skepsis v1 fin
 }
     
 .testimonium:before, .fragmentum:before{

@@ -32,7 +32,12 @@
             <div id="primary" class="home">
               <section id="accueil">  
                 <h1>{title}</h1>
-                  <section>{content}</section>
+                 
+                <h2>Testimonia</h2>
+                   <section data-load="/skepsis/inc/sceptici/{scepticus}/part/testimonium"></section>
+               <h2>Fragmenta</h2>
+                   <section data-load="/skepsis/inc/sceptici/{scepticus}/part/fragmentum"></section>  
+               
     
               </section>
             </div>
@@ -42,15 +47,15 @@
       <!-- /.container -->
     </div>
     <footer data-url="inc_footer"></footer>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+   <script src="/static/js/jquery-1.11.1.min.js"></script>
     <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-    <script src="/static/js/jquery-1.11.1.min.js"></script>
+ 
     <script src="/static/js/jquery.tablesorter.min.js"></script>
     <script src="/static/js/jquery.tablesorter.widgets.js"></script>
         <script src="/synopsx/files/js/synopsx.js"></script>
-        <script src="/static/skepsis/js/skepsis.js"></script>
+     <script src="/static/skepsis/js/skepsis.js"></script>
        <script>$( document ).ready(function() {
-              init();
+              skepsis();
           });
     </script>
   </body>

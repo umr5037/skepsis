@@ -66,17 +66,18 @@ function index() {
  : the HTML serialization also shows a bibliographical list
  :)
 declare 
-  %restxq:path('/skepsis/home')
+  %restxq:path('/skepsis/{$page}')
   %rest:produces('text/html')
   %output:method("html")
   %output:html-version("5.0")
-function home() {
+function page($page) {
   let $queryParams := map {
     'project' : $skepsis.webapp:project,
     'dbName' :  $skepsis.webapp:db,
     'model' : 'tei' ,
-    'function' : 'getTextById',
-    'id' : 'skepsis'
+    'function' : 'getDivById',
+    'id' : $page,
+    'lang' : 'fr'
     }
   let $outputParams := map {
     'lang' : 'fr',
@@ -87,6 +88,28 @@ function home() {
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
 };
 
+declare 
+  %restxq:path('/skepsis/en/{$page}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function pageEn($page) {
+  let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getDivById',
+    'id' : $page,
+    'lang' : 'en'
+    }
+  let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'home.xhtml',
+    'pattern' : 'inc_defaultItem.xhtml' ,
+    'xsl' : 'skepsis.xsl'
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
 
 
 (:~
@@ -307,7 +330,7 @@ function scepticusHtml($id,$notio) {
     
      let $outputParams := map {
     'lang' : 'fr',
-    'layout' : 'scepticus.xhtml',
+    'layout' : 'scepticusByNotio.xhtml',
     'pattern' : 'inc_textPartItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }  
@@ -509,6 +532,58 @@ function notionesIncHtml($scepticus) {
     'lang' : 'fr',
     'layout' : 'inc_defaultAside.xhtml',
     'pattern' : 'inc_notioNavItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
+
+declare 
+  %restxq:path('/skepsis/inc/sceptici/{$id}/part/{$type}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function scepticusByTextTypeHtml($id, $type) {
+    let $queryParams := map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getTextPartByScepticus',
+    'id' : $id,
+    'type' : $type,
+    'xsl' : 'skepsis.xsl' 
+    }
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'inc_textPartList.xhtml',
+    'pattern' : 'inc_textPartItem.xhtml' ,
+    'xsl' : 'skepsis.xsl' 
+    }  
+ return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
+};
+
+
+declare 
+  %restxq:path('/skepsis/inc/sceptici/{$id}/notio/{$notio}/part/{$type}')
+  %rest:produces('text/html')
+  %output:method("html")
+  %output:html-version("5.0")
+function scepticusByTextTypeHtml($id, $notio, $type) {
+    let $queryParams := fn:trace(map {
+    'project' : $skepsis.webapp:project,
+    'dbName' :  $skepsis.webapp:db,
+    'model' : 'tei' ,
+    'function' : 'getTextPartByScepticus',
+    'id' : $id,
+    'notio' : $notio,
+    'type' : $type,
+    'xsl' : 'skepsis.xsl' 
+    })
+    
+     let $outputParams := map {
+    'lang' : 'fr',
+    'layout' : 'inc_textPartList.xhtml',
+    'pattern' : 'inc_textPartItem.xhtml' ,
     'xsl' : 'skepsis.xsl' 
     }  
  return synopsx.lib.commons:htmlDisplay($queryParams, $outputParams)
