@@ -36,6 +36,27 @@ declare namespace tei = 'http://www.tei-c.org/ns/1.0' ;
 (: Use a default namespace :)
 declare default function namespace 'skepsis.models.tei' ;
 
+(:~
+ : this function returns a sequence of map for meta and content
+ : !! the result structure has changed to allow sorting early in mapping
+ :
+ : @rmq for testing with new htmlWrapping
+ :)
+declare function getDivById($queryParams as map(*)) as map(*) {
+ 
+  let $meta := map{
+    'title' : $queryParams('id')
+    }
+  let $content := map{
+    'tei' :  synopsx.lib.commons:getDb($queryParams)//tei:TEI[@xml:id='skepsis']//tei:div[@xml:id=$queryParams('id')]/tei:div[@xml:lang=$queryParams('lang')]    
+  }
+
+  return  map{
+    'meta'    : $meta,
+    'content' : $content
+    }
+};
+
 
 (:~
  : this function returns a sequence of map for meta and content
@@ -49,7 +70,8 @@ declare function getScepticiList($queryParams as map(*)) as map(*) {
   let $meta := map{
     'title' : 'Liste des sceptiques'
     }
-  let $content := for $item in $sceptici return getScepticus($item)
+  let $content := for $item in $sceptici   order by $item collation "?lang=fr-FR" return getScepticus($item)
+
   return  map{
     'meta'    : $meta,
     'content' : $content
@@ -67,11 +89,17 @@ map {
     }
 };
 
+
+
 (: TODO : factoriser getTextPartByScepticus et getTextPartByNotio !!!!:)
 
 declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
+
   let $ref := '#' ||  $queryParams('id')
-  let $parts := synopsx.lib.commons:getDb($queryParams)//tei:*[(@corresp | @source) contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
+  let $textType := $queryParams('type')
+  let $parts := if (fn:empty($textType)) 
+                then synopsx.lib.commons:getDb($queryParams)//tei:*[(@corresp | @source) contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
+                else  synopsx.lib.commons:getDb($queryParams)//tei:*[@type = $textType][(@corresp | @source) contains text {$ref}][fn:not(ancestor-or-self::*[@type='translatio'])]
   let $notio :=  $queryParams('notio')
   let $parts := if (fn:empty($notio))
   then  $parts
@@ -79,11 +107,15 @@ declare function getTextPartByScepticus($queryParams as map(*)) as map(*) {
    let $notio :=  '#' || $notio
    return $parts[ancestor-or-self::*[@ana contains text {$notio}]]
   let $meta := map{
-    'title' : 'Sceptique : ' ||  $queryParams('id'),
-    'scepticus'  : $queryParams('id')
+    'title' : $queryParams('id'),
+    'scepticus'  : $queryParams('id'),
+    'type' : $textType,
+    'notioTitle' : map:get(getNotioById(map:put($queryParams, 'id', $notio)), 'title'),
+     'notio' : $notio
     }
-  let $content := for $item in $parts return 
-         getTextPartMap($item)
+  let $content := for $item in $parts         
+          order by fn:number($item/@n)
+          return getTextPartMap($item)
   return  map{
     'meta'    : $meta,
     'content' : $content
@@ -110,7 +142,10 @@ declare function getNotionesList($queryParams as map(*)) as map(*) {
   let $meta := map{
     'title' : 'Liste des notions'
     }
-  let $content := for $notio in $notiones return getNotioById(map:put($queryParams, 'id', $notio))
+  let $content := for $notio in $notiones 
+  let $map := getNotioById(map:put($queryParams, 'id', $notio))
+        order by fn:number($map('count')) descending,  $map('title')
+        return $map
   return  map{
     'meta'    : $meta,
     'content' : $content
@@ -200,18 +235,19 @@ declare function getSubSection($queryParams as map(*)) as map(*) {
   let $content :=
      map {
        'id' : fn:data($volumen/@xml:id),
-          'tei': $subSection,
-   'type' : fn:data($subSection/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')]/@type),
-          'gr' : $subSection/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')],
-          'fr' : $subSection/tei:*[fn:local-name()='ab' or fn:local-name()='q'][@type='translatio'],
-           'title' : $title,
+       'tei': $subSection,
+       'type' : fn:data($subSection/tei:*[fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')]/@type),
+       'gr' : $subSection/tei:*[fn:local-name()='head' or fn:local-name()='ab' or fn:local-name()='q'][fn:not(@type='translatio')],
+       'fr' : $subSection/tei:*[fn:local-name()='head' or fn:local-name()='ab' or fn:local-name()='q'][@type='translatio'],
+        'title' : $title,
     'author' : $author,
     'livre' : map:get($queryParams, 'livre'),
     'subSection' : $queryParams('subSection')  ,
+     'subSectionType' : fn:trace(fn:data($subSection/@type) ) ,
     'nextLivre' : fn:data($nextSubSection/ancestor::*[@type='livre']/@n),
      'prevLivre' : fn:data($previousSubSection/ancestor::*[@type='livre']/@n),
      'nextSubSection' : fn:data($nextSubSection/@n),
-    'prevSubSection' : fn:data($previousSubSection//@n)
+    'prevSubSection' : fn:data($previousSubSection/@n)
          } 
   return  map{
     'meta'    : $meta,
@@ -220,9 +256,9 @@ declare function getSubSection($queryParams as map(*)) as map(*) {
 };
 
 declare function getParagraph($textPart as node())  {
-  let $textPartId :=  fn:trace($textPart/@xml:id)
+  let $textPartId :=  $textPart/@xml:id
   let $tei := $textPart//ancestor::tei:TEI
-  let $paragraph := fn:trace(($textPart/*:milestone)[1]/fn:data(@n))
+  let $paragraph := ($textPart/*:milestone)[1]/fn:data(@n)
   (: toto : quand texte avant le milestone, milestone précedent :)
   return if(fn:not(fn:empty($paragraph)) and  fn:normalize-space(($textPart/*:milestone)[1]/fn:string-join(preceding-sibling::text())) = '' ) then $paragraph 
           else $tei//tei:*[@xml:id = $textPartId]//(preceding::*:milestone)[1]/fn:data(@n) 
@@ -256,7 +292,8 @@ declare function getTextsList($queryParams as map(*)) as map(*) {
   let $meta := map{
     'title' : 'Liste des textes'
     }
-  let $content := for $volumen in synopsx.lib.commons:getDb($queryParams)/tei:TEI[fn:not(@xml:id = "skepsis")]       
+  let $content := for $volumen in synopsx.lib.commons:getDb($queryParams)/tei:TEI[fn:not(@xml:id = "skepsis")]  
+   order by $volumen//tei:titleStmt/tei:author , $volumen//tei:titleStmt/tei:title     
      return 
      map {
           'url': "volumina/" || $volumen/@xml:id,
@@ -320,6 +357,7 @@ declare function getTextPartMap($item as node()) as map(*) {
          'title':$item/ancestor::tei:TEI//tei:titleStmt/tei:title,
           'livre':fn:data($item/ancestor::tei:div[@type='livre']/@n),
           'subSection' :  fn:data($item/ancestor::tei:div[1]/@n),
+           'subSectionType' :  fn:data($item/ancestor::tei:div[1]/@type),
           'paragraphe' : fn:data(getParagraph($item))
         }        
 };

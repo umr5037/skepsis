@@ -24,14 +24,20 @@
           <div id="content" class="col-8 col-sm-8 col-lg-8 row row-offcanvas">
           <div id="secondary" class="aside">
        
-        <!--   <nav data-load="/skepsis/inc/notiones"></nav> -->
+        <nav data-load="/skepsis/inc/notiones/sceptici/{scepticus}"></nav>
+          <!-- Test load url relative (ok) -->
          
        
            </div>
             <div id="primary" class="home">
               <section id="accueil">  
-                <h1>{title}</h1>
-                  <section>{content}</section>
+                <h1><span>{notioTitle} &#160;</span> &#160; apud &#160; <span>{title}</span></h1>
+                 
+                <h2>Testimonia</h2>
+                   <section data-load="/skepsis/inc/sceptici/{scepticus}/notio/{notio}/part/testimonium"></section>
+               <h2>Fragmenta</h2>
+                   <section data-load="/skepsis/inc/sceptici/{scepticus}/notio/{notio}/part/fragmentum"></section>  
+               
     
               </section>
             </div>
@@ -41,8 +47,9 @@
       <!-- /.container -->
     </div>
     <footer data-url="inc_footer"></footer>
-    <script src="/static/js/jquery-1.11.1.min.js"></script>
+   <script src="/static/js/jquery-1.11.1.min.js"></script>
     <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+ 
     <script src="/static/js/jquery.tablesorter.min.js"></script>
     <script src="/static/js/jquery.tablesorter.widgets.js"></script>
         <script src="/synopsx/files/js/synopsx.js"></script>

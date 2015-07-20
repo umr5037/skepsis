@@ -13,11 +13,19 @@
     </xsl:template>
 
 <xsl:template match="*:ab | *:q">
-<span>
-<xsl:attribute name="title">Ref. :  <xsl:value-of select="@xml:id"/><xsl:text>&#xA;</xsl:text><xsl:value-of select="*:bibl"/></xsl:attribute>
-<xsl:apply-templates select="@*|node()"/>
-</span>
+    <span>
+    <xsl:attribute name="title">Ref. :  <xsl:value-of select="@xml:id"/><xsl:text>&#xA;</xsl:text>(= <xsl:value-of select="*:bibl"/>)</xsl:attribute>
+    <xsl:apply-templates select="@*|node()"/>
+    </span>
 </xsl:template>
+
+ <xsl:template match="*:quote">
+             <span class="citation">
+             <xsl:apply-templates />
+             </span>
+    </xsl:template>
+
+
    <xsl:template match="@type">
              <xsl:attribute name="class"><xsl:value-of select="."/></xsl:attribute>  
     </xsl:template>
@@ -35,7 +43,7 @@
    
    
     <xsl:template match="*:title[ancestor::*]">
-                 <em><xsl:apply-templates /></em>
+                 <span class="title"><xsl:apply-templates /></span>
     </xsl:template>
     
     <xsl:template match="*:list[@type='facettes']//*:item">

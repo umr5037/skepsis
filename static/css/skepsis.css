@@ -13,6 +13,16 @@ font-size:1em;
 font-family: 'GFS Didot', serif;
 }
 
+button{
+  display:block;
+  float:right;
+  height:18px;
+}
+
+button.tei{
+  margin : 0 300px 0 0;
+}
+
 #primary-nav.container{
 	background: #ab9e71 ;
 	color:#fff;
@@ -73,15 +83,19 @@ milestone{
 
 }
 
-persName{
-  color:#336699;
-}
-
 milestone:after{
 font-size:0.8em;
 font-weight:bold;
 padding:0 3px;
 content:attr(n);
+}
+
+persName{
+  color:#336699;
+}
+
+.title{
+  font-weight:bold;
 }
 
 .textPart{
@@ -90,6 +104,10 @@ content:attr(n);
 
 header.linkPlus{
   cursor:pointer;
+}
+
+.page{
+  display:none;
 }
 
 .textType{
@@ -104,19 +122,19 @@ header.linkPlus{
 
 
 .testimonium{
-	background-color: #ddeeff;
+	
 }
 
 .citation{
-	background-color: #ffeedd;
+		font-style:italic;
 }
 
 .scholarchus{
-		background-color: #eeffdd;
+
 }
 
 .fragmentum{
-		font-style:italic;
+
 }
     
 .testimonium:before, .fragmentum:before{
