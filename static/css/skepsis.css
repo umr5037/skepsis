@@ -79,10 +79,13 @@ list-style-type: square;
 
 
 
+
+
+
+
 milestone{
 
 }
-
 
 milestone:after{
 font-size:0.8em;
@@ -91,9 +94,11 @@ padding:0 3px;
 content:attr(n);
 }
 
+
 persName{
   color:#336699;
 }
+
 
 .title{
   font-weight:bold;
@@ -124,6 +129,7 @@ header.linkPlus{
 
 .testimonium{
 
+
 }
 
 .citation{
@@ -143,6 +149,19 @@ header.linkPlus{
 }
 
 .scholarchus{
+
+}
+
+.citation{
+		font-style:italic;
+}
+
+.scholarchus{
+
+}
+
+.fragmentum{
+
 
 }
     
