@@ -60,8 +60,12 @@ font-weight:bold;
 margin:0;
 }
 
-#primary a{
+
+
+
+#primary a, head{
 color: #ab9e71 ;
+
 }
 
 #primary ul li:before{
@@ -77,12 +81,17 @@ ul{
 list-style-type: square;
 }
 
-
-
-
-
-
-
+ .person{
+ color:#000;
+ text-shadow: 1px 1px 1px #888;
+ }
+ 
+ a .person{
+ color:#ab9e71;
+ text-shadow: none;
+ }
+ 
+ 
 milestone{
 
 }
@@ -94,10 +103,6 @@ padding:0 3px;
 content:attr(n);
 }
 
-
-persName{
-  color:#336699;
-}
 
 
 .title{

@@ -24,6 +24,11 @@
              <xsl:apply-templates />
              </span>
     </xsl:template>
+     <xsl:template match="*:persName">
+             <span class="person">
+               <xsl:apply-templates />
+             </span>
+    </xsl:template>
 
 
    <xsl:template match="@type">

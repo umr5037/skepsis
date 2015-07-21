@@ -82,7 +82,7 @@ declare function getScepticiList($queryParams as map(*)) as map(*) {
 declare function getScepticus($item) as map(*){
 
 map {
-     'url' : 'sceptici/' || $item/@xml:id,
+     'id' : fn:data($item/@xml:id),
      'fr' : $item/tei:persName[@xml:lang='fr'],
      'la' : $item/tei:persName[@xml:lang='la'],
      'tei' : $item
