@@ -19,11 +19,19 @@
     </span>
 </xsl:template>
 
+ <xsl:template match="*:head">
+ <xsl:variable name="level" select="count(./ancestor::*:div) + 4 mod 6"/>
+             <xsl:element name="h{$level}">
+             <xsl:apply-templates />
+             </xsl:element>
+    </xsl:template>
+
  <xsl:template match="*:quote">
              <span class="citation">
              <xsl:apply-templates />
              </span>
     </xsl:template>
+    
      <xsl:template match="*:persName">
              <span class="person">
                <xsl:apply-templates />

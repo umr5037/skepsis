@@ -56,6 +56,13 @@ font-size:1.4em;
 font-weight:bold;
 }
 
+h4, h4 span.person {
+  font-size:1.1em;
+  font-variant : small-caps;
+  padding: 0 0 10px 0;
+  color:#ab9e71;
+}
+
 #primary ul{
 margin:0;
 }
