@@ -97,7 +97,10 @@ list-style-type: square;
  color:#ab9e71;
  text-shadow: none;
  }
- 
+
+.title, .person, a{
+  padding:0 3px;
+} 
  
 milestone{
 

@@ -3,7 +3,7 @@
      xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs">
     <xsl:output method="xml" encoding="UTF-8" indent="yes" omit-xml-declaration="yes"/>
-    <xsl:strip-space elements="*"/>
+  
    
     <xsl:import href="tei2html5.xsl"/>
     
