@@ -4,7 +4,7 @@ function skepsis(){
    $('.more').hide();
    $('.linkPlus').click(function() {
                 $( this ).next().toggle( "fast" );
-                $( this ).text($( this ).text() == "Afficher" ? "Masquer" : "Afficher");
+                $( this ).text($( this ).text() == "Masquer" ? "Afficher" : "Masquer");
           });
   
   
@@ -15,6 +15,7 @@ function skepsis(){
            $(this).find('.more').hide();
           $(this).find('.linkPlus').click(function() {
                 $( this ).next().toggle( "fast" );
+                $( this ).text($( this ).text() == "Masquer" ? "Afficher" : "Masquer");
           });
        } );     
       }); 
