@@ -4,6 +4,7 @@ function skepsis(){
    $('.more').hide();
    $('.linkPlus').click(function() {
                 $( this ).next().toggle( "fast" );
+                $( this ).text($( this ).text() == "Afficher" ? "Masquer" : "Afficher");
           });
   
   
