@@ -569,7 +569,7 @@ declare
   %output:method("html")
   %output:html-version("5.0")
 function scepticusByTextTypeHtml($id, $notio, $type) {
-    let $queryParams := fn:trace(map {
+    let $queryParams := map {
     'project' : $skepsis.webapp:project,
     'dbName' :  $skepsis.webapp:db,
     'model' : 'tei' ,
@@ -578,7 +578,7 @@ function scepticusByTextTypeHtml($id, $notio, $type) {
     'notio' : $notio,
     'type' : $type,
     'xsl' : 'skepsis.xsl' 
-    })
+    }
     
      let $outputParams := map {
     'lang' : 'fr',

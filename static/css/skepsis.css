@@ -16,11 +16,13 @@ font-family: 'GFS Didot', serif;
 button{
   display:block;
   float:right;
-  height:18px;
+  height:16px;
 }
 
 button.tei{
-  margin : 0 300px 0 0;
+  display:inline-block;
+  float:right;
+  margin-right :400px;
 }
 
 #primary-nav.container{
