@@ -19,9 +19,4 @@ function skepsis(){
           });
        } );     
       }); 
-
-
-
-
-
 };
