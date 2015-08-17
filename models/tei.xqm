@@ -43,12 +43,13 @@ declare default function namespace 'skepsis.models.tei' ;
  : @rmq for testing with new htmlWrapping
  :)
 declare function getDivById($queryParams as map(*)) as map(*) {
- 
+ let $div := synopsx.lib.commons:getDb($queryParams)//tei:TEI[@xml:id='skepsis']//tei:div[@xml:id=$queryParams('id')]/tei:div[@xml:lang=$queryParams('lang')]  
   let $meta := map{
-    'title' : $queryParams('id')
+    'title' : fn:data($div/@n),
+    'id' : $queryParams('id')
     }
   let $content := map{
-    'tei' :  synopsx.lib.commons:getDb($queryParams)//tei:TEI[@xml:id='skepsis']//tei:div[@xml:id=$queryParams('id')]/tei:div[@xml:lang=$queryParams('lang')]    
+    'tei' :  $div  
   }
 
   return  map{
