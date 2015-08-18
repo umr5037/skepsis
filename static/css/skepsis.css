@@ -28,6 +28,11 @@ button.tei{
 #primary-nav.container{
 	background: #ab9e71 ;
 	color:#fff;
+
+}
+
+#primary-nav.container a {
+        margin: 0 15px;
 }
 
 #primary-nav.container a:link {
@@ -35,6 +40,15 @@ button.tei{
 	color:#fff;
 }
 
+
+
+#primary-nav li.active 
+{
+  color: #000000;
+  background-color: #ffffff;
+  padding-bottom:1.5em;
+
+}
 
 #content{
 width:100%;
