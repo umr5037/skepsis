@@ -110,8 +110,8 @@ list-style-type: square;
  text-shadow: none;
  }
 
-.title, .person, a{
-  padding:0 3px;
+.title, .person, a, .citation{
+  padding:0 2px;
 } 
  
 milestone{
